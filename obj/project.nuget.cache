@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "tuJDtvoP7mI=",
+  "success": true,
+  "projectFilePath": "/home/talon/Code/GitHub/AirportSim/AirportSim.csproj",
+  "expectedPackageFiles": [
+    "/home/talon/.nuget/packages/microsoft.aspnetcore.app.ref/10.0.0/microsoft.aspnetcore.app.ref.10.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
