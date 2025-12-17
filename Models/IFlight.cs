@@ -1,4 +1,4 @@
-namespace AirpprtSimulator.Models;
+namespace AirportSimulator.Models;
 
 public interface IFlight
 {
@@ -22,7 +22,7 @@ public interface IFlight
 
     // Passengers
     int PassengerCapacity { get; }
-    int ChekcedInPassengers { get; }
+    int CheckedInPassengers { get; }
 
     // Methods
     void CheckInPassenger();
