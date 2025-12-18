@@ -15,7 +15,13 @@ public class DomesticFlight : IFlight
     public int PassengerCapacity { get; }
 
     private int _checkedInPassengers;
+    private readonly object _passengerLock = new object();
+    private int _delayMinutes;
+
     public int CheckedInPassengers => _checkedInPassengers;
+    public int DelayMinutes => _delayMinutes;
+    public DateTime ExpectedDeparture => ScheduledDeparture.AddMinutes(_delayMinutes);
+    public DateTime ExpectedArrival => ScheduledArrival.AddMinutes(_delayMinutes);
 
     public DomesticFlight(string flightNumber, string airline, string origin,
                          string destination, DateTime scheduledDeparture, int capacity)
@@ -32,17 +38,21 @@ public class DomesticFlight : IFlight
         PassengerCapacity = capacity;
         Status = FlightStatus.Scheduled;
         _checkedInPassengers = 0;
+        _delayMinutes = 0;
     }
 
     public void CheckInPassenger()
     {
-        if (_checkedInPassengers >= PassengerCapacity)
-            throw new InvalidOperationException("Flight is full");
+        lock (_passengerLock)
+        {
+            if (_checkedInPassengers >= PassengerCapacity)
+                throw new InvalidOperationException("Flight is full");
 
-        if (Status == FlightStatus.Departed || Status == FlightStatus.InFlight)
-            throw new InvalidOperationException("Cannot check in - flight already departed");
+            if (Status == FlightStatus.Departed || Status == FlightStatus.InFlight)
+                throw new InvalidOperationException("Cannot check in - flight already departed");
 
-        _checkedInPassengers++;
+            _checkedInPassengers++;
+        }
     }
 
     public void StartBoarding()
@@ -71,9 +81,7 @@ public class DomesticFlight : IFlight
             throw new InvalidOperationException("Cannot delay - flight already departed/arrived");
 
         Status = FlightStatus.Delayed;
-        // Shift both departure and arrival
-        var newDeparture = ScheduledDeparture.AddMinutes(minutes);
-        var newArrival = ScheduledArrival.AddMinutes(minutes);
+        _delayMinutes += minutes;
     }
 
     public void Arrive()
