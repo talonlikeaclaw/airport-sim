@@ -17,6 +17,11 @@ public class CargoFlight : IFlight
     public double CargoWeightKg { get; private set; }
     public double MaxCargoWeightKg { get; }
 
+    private int _delayMinutes;
+    public int DelayMinutes => _delayMinutes;
+    public DateTime ExpectedDeparture => ScheduledDeparture.AddMinutes(_delayMinutes);
+    public DateTime ExpectedArrival => ScheduledArrival.AddMinutes(_delayMinutes);
+
     public CargoFlight(string flightNumber, string airline, string origin,
                       string destination, DateTime scheduledDeparture, double maxCargoWeight)
     {
@@ -32,6 +37,7 @@ public class CargoFlight : IFlight
         MaxCargoWeightKg = maxCargoWeight;
         Status = FlightStatus.Scheduled;
         CargoWeightKg = 0;
+        _delayMinutes = 0;
     }
 
     public void LoadCargo(double weightKg)
@@ -70,6 +76,7 @@ public class CargoFlight : IFlight
             throw new InvalidOperationException("Cannot delay - flight already departed/arrived");
 
         Status = FlightStatus.Delayed;
+        _delayMinutes += minutes;
     }
 
     public void Arrive()
