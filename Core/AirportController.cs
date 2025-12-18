@@ -164,6 +164,44 @@ public sealed class AirportController
         _logger.Success($"Check-in complete: {flight.CheckedInPassengers} passengers on {flightNumber}");
     }
 
+    public void LoadCargo(string flightNumber, double weightKg)
+    {
+        var flight = GetFlightByNumber(flightNumber);
+
+        if (flight is not CargoFlight cargoFlight)
+            throw new InvalidOperationException($"Flight {flightNumber} is not a cargo flight");
+
+        cargoFlight.LoadCargo(weightKg);
+        _logger.Info($"Cargo loaded: {flightNumber} ({cargoFlight.CargoWeightKg:F1}/{cargoFlight.MaxCargoWeightKg:F1} kg)");
+    }
+
+    public void ProcessBatchCargoLoading(string flightNumber, double totalWeight, int batches)
+    {
+        var flight = GetFlightByNumber(flightNumber);
+
+        if (flight is not CargoFlight cargoFlight)
+            throw new InvalidOperationException($"Flight {flightNumber} is not a cargo flight");
+
+        _logger.Info($"Processing {batches} cargo batches ({totalWeight:F1} kg total) for {flightNumber}...");
+
+        double weightPerBatch = totalWeight / batches;
+
+        // Use Parallel.For to simulate loading multiple cargo batches
+        Parallel.For(0, batches, i =>
+        {
+            try
+            {
+                cargoFlight.LoadCargo(weightPerBatch);
+            }
+            catch (InvalidOperationException)
+            {
+                // Flight full, stop trying
+            }
+        });
+
+        _logger.Success($"Cargo loading complete: {cargoFlight.CargoWeightKg:F1} kg loaded on {flightNumber}");
+    }
+
     public IFlight GetFlightByNumber(string flightNumber)
     {
         var flight = _flights.FirstOrDefault(f => f.FlightNumber == flightNumber);
@@ -181,16 +219,13 @@ public sealed class AirportController
 
     public IEnumerable<IFlight> GetDepartingFlights()
     {
-        return _flights.Where(f => f.Status == FlightStatus.Scheduled ||
-                                  f.Status == FlightStatus.Boarding ||
-                                  f.Status == FlightStatus.Delayed)
+        return _flights.Where(f => f.Origin == "YUL")
                       .OrderBy(f => f.ScheduledDeparture);
     }
 
     public IEnumerable<IFlight> GetArrivingFlights()
     {
-        return _flights.Where(f => f.Status == FlightStatus.InFlight ||
-                                  f.Status == FlightStatus.Arrived)
+        return _flights.Where(f => f.Destination == "YUL")
                       .OrderBy(f => f.ScheduledArrival);
     }
 
