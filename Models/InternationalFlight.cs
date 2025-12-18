@@ -25,7 +25,8 @@ public class InternationalFlight : IFlight
     public DateTime ExpectedArrival => ScheduledArrival.AddMinutes(_delayMinutes);
 
     public InternationalFlight(string flightNumber, string airline, string origin,
-                              string destination, DateTime scheduledDeparture, int capacity)
+                              string destination, DateTime scheduledDeparture, int capacity,
+                              FlightStatus initialStatus = FlightStatus.Scheduled)
     {
         if (string.IsNullOrWhiteSpace(flightNumber))
             throw new ArgumentException("Flight number cannot be empty", nameof(flightNumber));
@@ -37,7 +38,7 @@ public class InternationalFlight : IFlight
         ScheduledDeparture = scheduledDeparture;
         ScheduledArrival = scheduledDeparture.AddHours(8); // International ~8 hours
         PassengerCapacity = capacity;
-        Status = FlightStatus.Scheduled;
+        Status = initialStatus;
         _checkedInPassengers = 0;
         _delayMinutes = 0;
     }

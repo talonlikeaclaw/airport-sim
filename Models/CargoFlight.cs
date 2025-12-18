@@ -23,7 +23,8 @@ public class CargoFlight : IFlight
     public DateTime ExpectedArrival => ScheduledArrival.AddMinutes(_delayMinutes);
 
     public CargoFlight(string flightNumber, string airline, string origin,
-                      string destination, DateTime scheduledDeparture, double maxCargoWeight)
+                      string destination, DateTime scheduledDeparture, double maxCargoWeight,
+                      FlightStatus initialStatus = FlightStatus.Scheduled)
     {
         if (string.IsNullOrWhiteSpace(flightNumber))
             throw new ArgumentException("Flight number cannot be empty", nameof(flightNumber));
@@ -35,7 +36,7 @@ public class CargoFlight : IFlight
         ScheduledDeparture = scheduledDeparture;
         ScheduledArrival = scheduledDeparture.AddHours(5); // Cargo ~5 hours
         MaxCargoWeightKg = maxCargoWeight;
-        Status = FlightStatus.Scheduled;
+        Status = initialStatus;
         CargoWeightKg = 0;
         _delayMinutes = 0;
     }

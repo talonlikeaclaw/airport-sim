@@ -24,7 +24,8 @@ public class DomesticFlight : IFlight
     public DateTime ExpectedArrival => ScheduledArrival.AddMinutes(_delayMinutes);
 
     public DomesticFlight(string flightNumber, string airline, string origin,
-                         string destination, DateTime scheduledDeparture, int capacity)
+                         string destination, DateTime scheduledDeparture, int capacity,
+                         FlightStatus initialStatus = FlightStatus.Scheduled)
     {
         if (string.IsNullOrWhiteSpace(flightNumber))
             throw new ArgumentException("Flight number cannot be empty", nameof(flightNumber));
@@ -36,7 +37,7 @@ public class DomesticFlight : IFlight
         ScheduledDeparture = scheduledDeparture;
         ScheduledArrival = scheduledDeparture.AddHours(2.5); // Domestic ~2.5 hours
         PassengerCapacity = capacity;
-        Status = FlightStatus.Scheduled;
+        Status = initialStatus;
         _checkedInPassengers = 0;
         _delayMinutes = 0;
     }
